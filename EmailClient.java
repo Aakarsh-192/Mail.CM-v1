@@ -22,24 +22,15 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumnModel;
 
-/**
- * EmailClient.java
- * The main application frame, containing the Mailbox UI and navigation.
- */
 public class EmailClient extends JFrame {
 
-    // --- Core Constants ---
-    // UPDATED: Case sensitive name
     public static final String APP_NAME = "Mail.CM";
     public static final String DOMAIN = "@mail.cm";
-    public static final int UNSEND_TIMEOUT_MS = 60000; // 60 seconds
+    public static final int UNSEND_TIMEOUT_MS = 60000;
 
-    // --- Application State and Management ---
     private final CardLayout cardLayout;
     private final JPanel mainPanel;
     
-    // **OOP: Polymorphism & Interfaces**
-    // We use the interface IDataManager instead of the concrete class.
     public final IDataManager dataManager;
     
     private User loggedInUser;
@@ -49,8 +40,6 @@ public class EmailClient extends JFrame {
     private MailboxPanel mailboxPanel;
 
     public EmailClient() {
-        // **Exception Handling & Polymorphism**
-        // Try to initialize JDBC, fallback to File-based if SQL driver is missing.
         IDataManager tempManager;
         try {
             Class.forName("org.sqlite.JDBC");
@@ -67,7 +56,6 @@ public class EmailClient extends JFrame {
         setSize(1200, 800);
         setLocationRelativeTo(null);
         
-        // UPDATED: Set Application Icon
         try {
             ImageIcon icon = new ImageIcon("CMlogo.png");
             setIconImage(icon.getImage());
@@ -91,8 +79,6 @@ public class EmailClient extends JFrame {
     public IDataManager getDataManager() {
         return dataManager;
     }
-
-    // --- UI Navigation Methods ---
 
     public void showWelcome() {
         setTitle(APP_NAME);
@@ -134,13 +120,11 @@ public class EmailClient extends JFrame {
         showWelcome();
     }
 
-    // --- Main Method ---
 
     public static void main(String[] args) {
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         } catch (Exception e) {
-            // Ignore
         }
 
         SwingUtilities.invokeLater(() -> {
@@ -163,7 +147,6 @@ public class EmailClient extends JFrame {
         return button;
     }
 
-    // 0. Welcome Panel
     class WelcomePanel extends JPanel {
         public WelcomePanel(EmailClient client) {
             setLayout(new GridBagLayout());
@@ -203,7 +186,6 @@ public class EmailClient extends JFrame {
         }
     }
 
-    // 3. Main Mailbox Panel
     public class MailboxPanel extends JPanel {
         private final EmailClient client;
         private final IDataManager dataManager;
@@ -403,7 +385,6 @@ public class EmailClient extends JFrame {
         }
     }
 
-    // 4. Mail List Panel
     public class MailListPanel extends JPanel {
         protected final MailboxPanel parentPanel;
         protected final EmailClient client;
@@ -639,9 +620,6 @@ public class EmailClient extends JFrame {
             if (viewType == ViewType.INBOX) {
                 refreshButton = client.createStyledButton("Refresh", Color.LIGHT_GRAY, Color.BLACK);
                 refreshButton.addActionListener(e -> {
-                    // **Multithreading & Synchronization**
-                    // Using SwingWorker to perform IO operations (DB refresh) in background
-                    // avoiding UI freeze.
                     refreshButton.setEnabled(false);
                     refreshButton.setText("Refreshing...");
                     
@@ -678,9 +656,9 @@ public class EmailClient extends JFrame {
             deleteButton = client.createStyledButton("Delete Selected", new Color(219, 68, 55), Color.BLACK);
             deleteButton.addActionListener(e -> {
                 if (viewType == ViewType.INBOX || viewType == ViewType.ARCHIVE) {
-                    moveSelectedEmails(EmailStatus.DELETED); // Move to trash
+                    moveSelectedEmails(EmailStatus.DELETED);
                 } else {
-                    deleteSelectedEmails(true); // Permanent deletion
+                    deleteSelectedEmails(true);
                 }
             });
             controlsPanel.add(deleteButton);
@@ -980,7 +958,6 @@ public class EmailClient extends JFrame {
         }
     }
 
-    // 5. Sent List Panel
     public class SentListPanel extends MailListPanel {
 
         public SentListPanel(MailboxPanel parentPanel, EmailClient client) {
@@ -1133,7 +1110,6 @@ public class EmailClient extends JFrame {
         }
     }
 
-    // 6. Trash Panel
     public class TrashPanel extends MailListPanel {
 
         private JButton recoverSelectedButton;
@@ -1199,7 +1175,6 @@ public class EmailClient extends JFrame {
         }
     }
 
-    // 7. Compose Panel
     public class ComposePanel extends JPanel {
 
         private class AttachmentItem {
@@ -1227,7 +1202,7 @@ public class EmailClient extends JFrame {
 
         public boolean isLoading = false;
         private Email currentDraft = null;
-        private boolean isUpdatingToField = false; // Lock for sync
+        private boolean isUpdatingToField = false;
 
         private final JTextArea toField;
         private final JTextField subjectField;
@@ -1235,11 +1210,9 @@ public class EmailClient extends JFrame {
         private final MailboxPanel parentPanel;
         private final EmailClient client;
 
-        // **NEW:** Replaced JList with JPanel for custom layout
         private JPanel attachmentsContainer; 
         private List<AttachmentItem> currentAttachments = new ArrayList<>();
-        
-        // **NEW:** Contacts dropdown Logic
+
         private List<JCheckBox> contactCheckboxes = new ArrayList<>();
 
         public ComposePanel(MailboxPanel parentPanel, EmailClient client) {
@@ -1247,7 +1220,6 @@ public class EmailClient extends JFrame {
             this.client = client;
             setLayout(new BorderLayout());
 
-            // Top control panel
             JPanel controlsPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
             controlsPanel.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, Color.LIGHT_GRAY));
 
@@ -1275,7 +1247,6 @@ public class EmailClient extends JFrame {
 
             add(controlsPanel, BorderLayout.NORTH);
 
-            // Input fields
             JPanel inputPanel = new JPanel(new GridBagLayout());
             inputPanel.setBorder(new EmptyBorder(10, 20, 10, 20));
             GridBagConstraints gbc = new GridBagConstraints();
@@ -1283,20 +1254,18 @@ public class EmailClient extends JFrame {
             gbc.weightx = 1.0;
             gbc.gridx = 0;
 
-            // To Label
             gbc.gridy = 0;
             inputPanel.add(new JLabel("To:"), gbc);
-            
-            // To Field + Contact Button
+
             gbc.gridy = 1;
             JPanel toContainer = new JPanel(new BorderLayout(5, 0));
-            toField = new JTextArea(2, 50); // **MODIFIED:** Taller
+            toField = new JTextArea(2, 50);
             toField.setLineWrap(true);
             toField.setWrapStyleWord(true);
             toField.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY));
-            toField.setMargin(new Insets(5, 8, 5, 8)); // **MODIFIED:** Padding
+            toField.setMargin(new Insets(5, 8, 5, 8));
             
-            JButton contactsBtn = new JButton("Contacts \u25BC"); // Down arrow char
+            JButton contactsBtn = new JButton("Contacts \u25BC");
             contactsBtn.setPreferredSize(new Dimension(100, 0));
             contactsBtn.addActionListener(e -> showContactsPopup(contactsBtn));
 
@@ -1304,21 +1273,18 @@ public class EmailClient extends JFrame {
             toContainer.add(contactsBtn, BorderLayout.EAST);
             inputPanel.add(toContainer, gbc);
 
-            // Subject Label
             gbc.gridy = 2;
             gbc.insets = new Insets(10, 0, 0, 0);
             inputPanel.add(new JLabel("Subject:"), gbc);
-            
-            // Subject Field
+
             gbc.gridy = 3;
             gbc.insets = new Insets(0, 0, 0, 0);
             subjectField = new JTextField();
             subjectField.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, Color.LIGHT_GRAY));
-            subjectField.setPreferredSize(new Dimension(0, 35)); // **MODIFIED:** Taller
+            subjectField.setPreferredSize(new Dimension(0, 35));
             subjectField.setMargin(new Insets(0, 5, 0, 5));
             inputPanel.add(subjectField, gbc);
 
-            // Attachments Panel
             gbc.gridy = 4;
             gbc.insets = new Insets(10, 0, 0, 0);
             
@@ -1328,10 +1294,9 @@ public class EmailClient extends JFrame {
             
             JScrollPane attachScroll = new JScrollPane(attachmentsContainer);
             attachScroll.setBorder(null);
-            attachScroll.setPreferredSize(new Dimension(0, 80)); // Fixed height for attachment area
+            attachScroll.setPreferredSize(new Dimension(0, 80));
             inputPanel.add(attachScroll, gbc);
 
-            // Body
             bodyArea = new JTextArea();
             bodyArea.setFont(new Font("Arial", Font.PLAIN, 14));
             bodyArea.setLineWrap(true);
@@ -1344,8 +1309,7 @@ public class EmailClient extends JFrame {
             centerWrapper.add(bodyScroll, BorderLayout.CENTER);
             
             add(centerWrapper, BorderLayout.CENTER);
-            
-            // Add listeners for synchronization
+
             toField.getDocument().addDocumentListener(new DocumentListener() {
                 public void insertUpdate(DocumentEvent e) { updateCheckboxesFromToField(); }
                 public void removeUpdate(DocumentEvent e) { updateCheckboxesFromToField(); }
@@ -1353,7 +1317,6 @@ public class EmailClient extends JFrame {
             });
         }
 
-        // --- Contacts Logic ---
 
         private void showContactsPopup(Component invoker) {
             JPopupMenu popup = new JPopupMenu();
@@ -1367,8 +1330,7 @@ public class EmailClient extends JFrame {
             String currentUserEmail = parentPanel.getLoggedInUser().getEmailId();
             
             contactCheckboxes.clear();
-            
-            // Get current emails from field to set initial state
+
             Set<String> currentEmails = getEmailsFromField();
 
             for (User user : allUsers) {
@@ -1379,12 +1341,10 @@ public class EmailClient extends JFrame {
                 checkBox.setBackground(Color.WHITE);
                 checkBox.setFocusPainted(false);
                 
-                // Set initial state
                 if (currentEmails.contains(user.getEmailId().toLowerCase())) {
                     checkBox.setSelected(true);
                 }
-                
-                // Add action listener for this checkbox
+
                 checkBox.addActionListener(e -> {
                     if (isUpdatingToField) return;
                     updateToFieldFromCheckbox(user.getEmailId(), checkBox.isSelected());
@@ -1431,18 +1391,7 @@ public class EmailClient extends JFrame {
 
         private void updateCheckboxesFromToField() {
             if (isUpdatingToField) return; 
-            
-            // Note: We can't easily update the visible popup if it's open, 
-            // but we can update the internal state or the list if we kept a reference.
-            // However, the popup recreates the list every time it opens.
-            // This method effectively ensures that if the popup is somehow open (unlikely with modal blocking, 
-            // but possible with standard menus), or mainly for logic consistency.
-            // Since we recreate the popup on click, we just need `showContactsPopup` to read the text correctly,
-            // which it does via `getEmailsFromField()`. 
-            // So strictly speaking, no active pushing to UI is needed here unless the popup is persistent.
         }
-
-        // --- Attachments Logic ---
 
         private void attachFile() {
             JFileChooser fileChooser = new JFileChooser();
@@ -1476,9 +1425,9 @@ public class EmailClient extends JFrame {
                 JButton removeBtn = new JButton("x");
                 removeBtn.setMargin(new Insets(0, 4, 0, 4));
                 removeBtn.setPreferredSize(new Dimension(20, 20));
-                removeBtn.setBackground(Color.WHITE); // Modified
-                removeBtn.setForeground(Color.RED);   // Modified
-                removeBtn.setBorder(BorderFactory.createLineBorder(Color.RED)); // Modified
+                removeBtn.setBackground(Color.WHITE);
+                removeBtn.setForeground(Color.RED);
+                removeBtn.setBorder(BorderFactory.createLineBorder(Color.RED));
                 removeBtn.setFocusPainted(false);
                 removeBtn.setCursor(new Cursor(Cursor.HAND_CURSOR));
                 removeBtn.addActionListener(e -> removeAttachment(item));
@@ -1493,8 +1442,6 @@ public class EmailClient extends JFrame {
             attachmentsContainer.revalidate();
             attachmentsContainer.repaint();
         }
-
-        // --- Standard Compose Logic ---
 
         public void loadReply(Email originalEmail) {
             this.isLoading = true;
@@ -1598,13 +1545,11 @@ public class EmailClient extends JFrame {
                     return;
                 }
                 
-                // **NEW:** Subject is compulsory
                 if (subject.isEmpty()) {
                     JOptionPane.showMessageDialog(this, "Subject is required.", "Send Error", JOptionPane.ERROR_MESSAGE);
                     return;
                 }
                 
-                // **NEW:** Body OR Attachment required
                 if (body.isEmpty() && currentAttachments.isEmpty()) {
                     JOptionPane.showMessageDialog(this, "Please add a message body or an attachment.", "Send Error", JOptionPane.ERROR_MESSAGE);
                     return;
@@ -1651,13 +1596,13 @@ public class EmailClient extends JFrame {
                 }
             }
 
-            if (currentDraft != null) { // We are editing a draft
+            if (currentDraft != null) {
                 currentDraft.to = recipients;
                 currentDraft.subject = subject;
                 currentDraft.body = body;
                 currentDraft.attachmentPaths = savedAttachmentNames;
 
-                if (!isDraft) { // Sending the draft
+                if (!isDraft) {
                     String msgId = currentDraft.getMessageId();
                     Email recipientCopy = new Email(msgId, senderEmail, recipients, subject, body, savedAttachmentNames,
                             EmailStatus.INBOX);
@@ -1669,14 +1614,14 @@ public class EmailClient extends JFrame {
 
                     parentPanel.getDataManager().getEmails().remove(currentDraft);
 
-                } else { // Re-saving the draft
+                } else {
                     currentDraft.setStatus(EmailStatus.DRAFT);
                     currentDraft.setRead(true);
                 }
-            } else { // This is a new email
+            } else {
                 String msgId = UUID.randomUUID().toString();
 
-                if (!isDraft) { // Sending new email
+                if (!isDraft) {
                     Email recipientCopy = new Email(msgId, senderEmail, recipients, subject, body, savedAttachmentNames,
                             EmailStatus.INBOX);
                     parentPanel.getDataManager().addEmail(recipientCopy);
@@ -1685,7 +1630,7 @@ public class EmailClient extends JFrame {
                             EmailStatus.SENT);
                     parentPanel.getDataManager().addEmail(senderCopy);
 
-                } else { // Saving new draft
+                } else {
                     Email newDraft = new Email(msgId, senderEmail, recipients, subject, body, savedAttachmentNames,
                             EmailStatus.DRAFT);
                     parentPanel.getDataManager().addEmail(newDraft);
@@ -1721,7 +1666,6 @@ public class EmailClient extends JFrame {
         }
     }
 
-    // 8. Settings Panel
     public class SettingsPanel extends JPanel {
         private final MailboxPanel parentPanel;
         private final EmailClient client;
@@ -1743,7 +1687,7 @@ public class EmailClient extends JFrame {
             JPanel formPanel = new JPanel(new GridBagLayout());
             formPanel.setBackground(Color.WHITE);
             formPanel.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY, 1));
-            formPanel.setPreferredSize(new Dimension(600, 550)); // Increased height
+            formPanel.setPreferredSize(new Dimension(600, 550));
 
             GridBagConstraints gbc = new GridBagConstraints();
             gbc.insets = new Insets(10, 20, 10, 20);
@@ -1796,7 +1740,6 @@ public class EmailClient extends JFrame {
             confirmPasswordField = new JPasswordField(25);
             formPanel.add(confirmPasswordField, gbc);
 
-            // Save Button
             JButton saveButton = client.createStyledButton("Save Changes", new Color(52, 168, 83), Color.BLACK);
             gbc.gridx = 1;
             gbc.gridy = 5;
@@ -1805,16 +1748,14 @@ public class EmailClient extends JFrame {
             gbc.anchor = GridBagConstraints.EAST;
             gbc.insets = new Insets(30, 20, 10, 20);
             formPanel.add(saveButton, gbc);
-            
-            // Separator
+
             gbc.gridx = 0;
             gbc.gridy = 6;
             gbc.gridwidth = 2;
             gbc.fill = GridBagConstraints.HORIZONTAL;
             gbc.insets = new Insets(20, 0, 20, 0);
             formPanel.add(new JSeparator(), gbc);
-            
-            // Delete Account Button
+    
             JButton deleteAccountButton = client.createStyledButton("Delete Account", new Color(219, 68, 55), Color.WHITE);
             gbc.gridx = 0;
             gbc.gridy = 7;
@@ -1917,4 +1858,5 @@ public class EmailClient extends JFrame {
             }
         }
     }
+
 }
