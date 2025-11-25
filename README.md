@@ -30,7 +30,7 @@ java -cp "classes:sqlite-jdbc-3.51.0.0.jar" EmailClient
 - Sent
 - Archive
 - Trash
-- Multiuser
+- Multiuser (run another instance of start.bat)
 - JDBC Data Management
 - File Data Management
 - Account Deletion
