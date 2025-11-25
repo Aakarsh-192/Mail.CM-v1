@@ -7,10 +7,6 @@ import java.util.Set;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 
-/**
- * SignUp.java
- * Handles the multi-step registration (Create Account) process with a custom light UI.
- */
 public class SignUp extends JPanel {
     private final EmailClient client;
     private final IDataManager dataManager; // Updated to use Interface
@@ -535,4 +531,5 @@ public class SignUp extends JPanel {
             client.showLogin(); 
         }
     }
+
 }
