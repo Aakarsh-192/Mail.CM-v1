@@ -1,9 +1,5 @@
 import java.io.Serializable;
 
-/**
- * User.java
- * Represents a registered user account.
- */
 public class User implements Serializable {
     private static final long serialVersionUID = 1L;
     String name;
@@ -25,4 +21,5 @@ public class User implements Serializable {
     public void setPasswordHash(String passwordHash) { 
         this.passwordHash = passwordHash; 
     }
+
 }
