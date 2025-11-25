@@ -9,6 +9,7 @@ GUI based Java project for Email Client Simulation for GUVI.
 
 ## Installation and Startup
 
+Recommended method,  
 Download the latest release zip file > Extract > open `start.bat`  
   
 Alternative method,  
