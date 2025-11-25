@@ -1,9 +1,8 @@
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID; // Import UUID
+import java.util.UUID;
 
-// --- Data Model Enums ---
 enum EmailStatus {
     INBOX, ARCHIVED, DELETED, DRAFT, SENT 
 }
@@ -12,13 +11,9 @@ enum ViewType {
     INBOX, DRAFTS, SENT, ARCHIVE, DELETED, SETTINGS
 }
 
-/**
- * Email.java
- * Represents a single email message.
- */
 public class Email implements Serializable {
     private static final long serialVersionUID = 1L;
-    String messageId; // To link sent/inbox copies for "unsend"
+    String messageId;
     String from;
     List<String> to;
     String subject;
@@ -28,9 +23,8 @@ public class Email implements Serializable {
     boolean isRead;
     EmailStatus status; 
 
-    // Constructor for new emails (generates a new messageId)
     public Email(String from, List<String> to, String subject, String body, List<String> attachmentPaths, EmailStatus status) {
-        this.messageId = UUID.randomUUID().toString(); // Generate ID on creation
+        this.messageId = UUID.randomUUID().toString();
         this.from = from;
         this.to = to;
         this.subject = subject;
@@ -41,9 +35,8 @@ public class Email implements Serializable {
         this.status = status;
     }
     
-    // Constructor for creating copies with a shared messageId (for sending)
     public Email(String messageId, String from, List<String> to, String subject, String body, List<String> attachmentPaths, EmailStatus status) {
-        this.messageId = messageId; // Use existing ID
+        this.messageId = messageId;
         this.from = from;
         this.to = to;
         this.subject = subject;
@@ -54,7 +47,6 @@ public class Email implements Serializable {
         this.status = status;
     }
 
-    // Getters and Setters
     public String getMessageId() { return messageId; }
     public List<String> getTo() { return to; }
     public String getFrom() { return from; }
@@ -71,4 +63,5 @@ public class Email implements Serializable {
     public boolean isRecipient(String userEmail) {
         return to.stream().anyMatch(addr -> addr.equalsIgnoreCase(userEmail));
     }
+
 }
