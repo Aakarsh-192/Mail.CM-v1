@@ -8,18 +8,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
-
-/**
- * JDBCDataManager.java
- * Implementation of IDataManager using JDBC (SQL Database).
- * Demonstrates JDBC Connectivity, PreparedStatement, and Exception Handling.
- */
+ 
 public class JDBCDataManager implements IDataManager {
     private List<User> cachedUsers;
     private List<Email> cachedEmails;
-    
-    // Using SQLite for portable local database
-    // Changed DB name to v2 to ensure fresh table creation with corrected schema
+ 
     private static final String DB_URL = "jdbc:sqlite:database/mail_sql_v2.db";
     private static final String ATTACHMENTS_DIR_PATH = "database/attachments/"; 
 
@@ -27,8 +20,7 @@ public class JDBCDataManager implements IDataManager {
         try {
             Files.createDirectories(Paths.get("database"));
             Files.createDirectories(Paths.get(ATTACHMENTS_DIR_PATH));
-            
-            // Load Driver (Assuming sqlite-jdbc is in classpath)
+ 
             try {
                 Class.forName("org.sqlite.JDBC");
             } catch (ClassNotFoundException e) {
@@ -36,7 +28,7 @@ public class JDBCDataManager implements IDataManager {
             }
             
             createTables();
-            reloadData(); // Initial load
+            reloadData(); 
         } catch (IOException | SQLException e) {
             e.printStackTrace();
         }
@@ -52,17 +44,15 @@ public class JDBCDataManager implements IDataManager {
                 + " email text PRIMARY KEY,\n"
                 + " password text NOT NULL\n"
                 + ");";
-
-        // 'messageId' is no longer PRIMARY KEY to allow multiple copies (Sent/Inbox) of the same message ID.
-        // Added 'id' as the actual row Primary Key.
+ 
         String sqlEmails = "CREATE TABLE IF NOT EXISTS emails (\n"
                 + " id INTEGER PRIMARY KEY AUTOINCREMENT,\n"
                 + " messageId text,\n" 
                 + " sender text NOT NULL,\n"
-                + " recipients text NOT NULL,\n" // Stored as comma-separated string
+                + " recipients text NOT NULL,\n" 
                 + " subject text,\n"
                 + " body text,\n"
-                + " attachments text,\n" // Stored as comma-separated string
+                + " attachments text,\n" 
                 + " timestamp integer,\n"
                 + " isRead integer,\n"
                 + " status text\n"
@@ -86,7 +76,7 @@ public class JDBCDataManager implements IDataManager {
         try (Connection conn = connect();
              Statement stmt = conn.createStatement()) {
             
-            // Load Users
+       
             ResultSet rsUsers = stmt.executeQuery(selectUsers);
             while (rsUsers.next()) {
                 cachedUsers.add(new User(
@@ -95,8 +85,7 @@ public class JDBCDataManager implements IDataManager {
                     rsUsers.getString("password")
                 ));
             }
-
-            // Load Emails
+ 
             ResultSet rsEmails = stmt.executeQuery(selectEmails);
             while (rsEmails.next()) {
                 String toStr = rsEmails.getString("recipients");
@@ -125,7 +114,7 @@ public class JDBCDataManager implements IDataManager {
 
     @Override
     public void saveAll() {
-        // No-op for JDBC as we usually save incrementally
+   
     }
 
     @Override
@@ -149,7 +138,7 @@ public class JDBCDataManager implements IDataManager {
         }
     }
     
-    // UPDATED: Implemented the update logic using SQL
+ 
     @Override
     public void updateUser(User user) {
         String sql = "UPDATE users SET name = ?, password = ? WHERE email = ?";
@@ -159,8 +148,7 @@ public class JDBCDataManager implements IDataManager {
             pstmt.setString(2, user.getPasswordHash());
             pstmt.setString(3, user.getEmailId());
             pstmt.executeUpdate();
-            // In-memory 'cachedUsers' is already updated by reference in EmailClient, 
-            // so we don't need to manually update the list here.
+  
         } catch (SQLException e) {
             System.err.println("Error updating user: " + e.getMessage());
         }
@@ -172,19 +160,16 @@ public class JDBCDataManager implements IDataManager {
         String sqlEmails = "DELETE FROM emails WHERE sender = ?"; // Clean up sent mails
         
         try (Connection conn = connect()) {
-            // Delete User
+  
             try (PreparedStatement pstmt = conn.prepareStatement(sqlUser)) {
                 pstmt.setString(1, user.getEmailId());
                 pstmt.executeUpdate();
-            }
-            
-            // Delete Sent Emails (Optional clean up)
+            } 
             try (PreparedStatement pstmt = conn.prepareStatement(sqlEmails)) {
                 pstmt.setString(1, user.getEmailId());
                 pstmt.executeUpdate();
             }
-            
-            // Update Cache
+      
             cachedUsers.removeIf(u -> u.getEmailId().equalsIgnoreCase(user.getEmailId()));
             cachedEmails.removeIf(e -> e.getFrom().equalsIgnoreCase(user.getEmailId()));
             
@@ -232,4 +217,5 @@ public class JDBCDataManager implements IDataManager {
         File file = new File(ATTACHMENTS_DIR_PATH + uniqueFilename);
         return (file.exists() && file.isFile()) ? file : null;
     }
+
 }
