@@ -5,10 +5,6 @@ import java.util.Optional;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 
-/**
- * Login.java
- * Handles the multi-step login (Sign In) process with a custom light UI.
- */
 public class Login extends JPanel {
     private final EmailClient client;
     private final IDataManager dataManager;
@@ -19,11 +15,9 @@ public class Login extends JPanel {
     private Optional<User> targetUser = Optional.empty();
     private String userFirstName; 
 
-    // References to the step panels to clear them
     private Step1_Email step1;
     private Step2_Password step2;
 
-    // UI Colors
     private static final Color BG_COLOR = new Color(245, 245, 245);
     private static final Color CARD_BG_COLOR = Color.WHITE;
     private static final Color TEXT_COLOR = new Color(30, 30, 30);
@@ -50,26 +44,15 @@ public class Login extends JPanel {
         add(cardPanel, BorderLayout.CENTER);
     }
 
-    /**
-     * Clears all fields and resets the panel to step 1.
-     */
     public void clearFields() {
-        // Clear temporary data
         enteredEmail = null;
         targetUser = Optional.empty();
         userFirstName = null;
-        
-        // Clear text fields
         step1.emailField.setText("");
         step2.passwordField.setText("");
-        
-        // Reset password field to hide characters
         step2.passwordField.setEchoChar((char) UIManager.get("PasswordField.echoChar"));
-        
-        // Reset title
         step2.titleLabel.setText("Welcome"); 
         
-        // Reset to step 1
         showStep("Email");
     }
 
@@ -80,7 +63,6 @@ public class Login extends JPanel {
     private JPanel createLogoPanel() {
         JPanel logoPanel = new JPanel();
         logoPanel.setBackground(CARD_BG_COLOR);
-        // UPDATED: Case sensitive
         JLabel logoLabel = new JLabel("Mail.CM");
         logoLabel.setFont(new Font("Arial", Font.BOLD, 32));
         logoLabel.setForeground(LOGO_COLOR);
@@ -302,7 +284,7 @@ public class Login extends JPanel {
             if (userFirstName != null && !userFirstName.isEmpty()) {
                 titleLabel.setText("Welcome, " + userFirstName);
             } else {
-                titleLabel.setText("Welcome"); // Fallback
+                titleLabel.setText("Welcome"); 
             }
         }
 
@@ -317,4 +299,5 @@ public class Login extends JPanel {
             }
         }
     }
+
 }
