@@ -9,7 +9,7 @@ import javax.swing.border.EmptyBorder;
 
 public class SignUp extends JPanel {
     private final EmailClient client;
-    private final IDataManager dataManager; // Updated to use Interface
+    private final IDataManager dataManager;
     private final CardLayout cardLayout;
     private final JPanel cardPanel;
 
@@ -18,13 +18,10 @@ public class SignUp extends JPanel {
     private String tempEmailID; 
     private String tempPassword;
 
-    // References to step panels to clear them
     private Step1_Name step1;
     private Step2_Email step2;
     private Step3_Password step3;
 
-
-    // UI Colors
     private static final Color BG_COLOR = new Color(245, 245, 245);
     private static final Color CARD_BG_COLOR = Color.WHITE;
     private static final Color TEXT_COLOR = new Color(30, 30, 30);
@@ -53,31 +50,24 @@ public class SignUp extends JPanel {
         add(cardPanel, BorderLayout.CENTER);
     }
     
-    /**
-     * Clears all fields and resets the panel to step 1.
-     */
     public void clearFields() {
-        // Clear temporary data
         tempFirstName = null;
         tempLastName = null;
         tempEmailID = null;
         tempPassword = null;
         
-        // Clear text fields
         step1.firstNameField.setText("");
         step1.lastNameField.setText("");
         step2.emailIdField.setText("");
         step2.suggestionArea.setText("");
         step3.passwordField.setText("");
         step3.confirmPasswordField.setText("");
-        
-        // Reset checkbox and password field visibility
+      
         step3.showPasswordCheckbox.setSelected(false);
         char defaultEchoChar = (char) UIManager.get("PasswordField.echoChar");
         step3.passwordField.setEchoChar(defaultEchoChar);
         step3.confirmPasswordField.setEchoChar(defaultEchoChar);
         
-        // Reset to step 1
         showStep("Name");
     }
 
@@ -88,7 +78,6 @@ public class SignUp extends JPanel {
     private JPanel createLogoPanel() {
         JPanel logoPanel = new JPanel();
         logoPanel.setBackground(CARD_BG_COLOR);
-        // UPDATED: Case sensitive
         JLabel logoLabel = new JLabel("Mail.CM");
         logoLabel.setFont(new Font("Arial", Font.BOLD, 32));
         logoLabel.setForeground(LOGO_COLOR);
@@ -533,3 +522,4 @@ public class SignUp extends JPanel {
     }
 
 }
+
