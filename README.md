@@ -9,7 +9,10 @@ GUI based Java project for Email Client Simulation for GUVI.
 
 ## Installation and Startup
 
-Download the latest release zip file > Extract > open `start.bat` or  
+Download the latest release zip file > Extract > open `start.bat`  
+  
+Alternative method,  
+  
 Installation:
 ```bash
 git clone https://github.com/Aakarsh-192/Mail.CM-v1.git
