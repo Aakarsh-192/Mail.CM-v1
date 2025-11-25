@@ -6,11 +6,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-/**
- * FileDataManager.java
- * Implementation of IDataManager using Serialized Files.
- * Demonstrates Inheritance (Object -> FileDataManager) and Polymorphism.
- */
 public class FileDataManager implements IDataManager {
     private List<User> users;
     private List<Email> emails;
@@ -31,7 +26,6 @@ public class FileDataManager implements IDataManager {
     }
 
     private <T> List<T> loadData(String filename) {
-        // Synchronization for Thread Safety
         synchronized (this) {
             File file = new File(filename);
             if (!file.exists()) return new ArrayList<>();
@@ -98,21 +92,16 @@ public class FileDataManager implements IDataManager {
         saveData(USERS_FILE_PATH, users);
     }
     
-    // UPDATED: Implemented update logic (just resaves the file)
     @Override
     public void updateUser(User user) {
-        // Since 'user' is a reference to an object already in the 'users' list,
-        // we just need to save the list to disk.
         saveAll();
     }
 
     @Override
     public void deleteUser(User user) {
-        // Remove the user
+
         users.removeIf(u -> u.getEmailId().equalsIgnoreCase(user.getEmailId()));
         
-        // Ideally, we should also remove emails sent by this user or where they are the sole recipient.
-        // For now, removing the user prevents login.
         emails.removeIf(e -> e.getFrom().equalsIgnoreCase(user.getEmailId()));
         
         saveAll();
@@ -129,4 +118,5 @@ public class FileDataManager implements IDataManager {
         saveData(EMAILS_FILE_PATH, emails);
         saveData(USERS_FILE_PATH, users);
     }
+
 }
