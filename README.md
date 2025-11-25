@@ -34,6 +34,7 @@ java -cp "classes:sqlite-jdbc-3.51.0.0.jar" EmailClient
 - JDBC Data Management
 - File Data Management
 - Account Deletion
+- 3 test accounts already added manually (t1/t2/t3@mail.cm:000000) 
 
 
 ## Roadmap
